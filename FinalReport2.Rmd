@@ -1,0 +1,74 @@
+---
+title: "Cyclistic"
+author: "Elizabeth Arellano"
+date: "2025-05-30"
+output: html_document
+---
+# Cyclistic Bike-Share Analysis  
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# This sources your cleaning and analysis script
+source("Cleaning.R")
+source("Analysis.R")
+```
+
+
+## Introduction: A Brief Overview
+Problem statement: Cyclistic, a bike-share company in Chicago, offers three pricing plans: single ride passes, full day passes, and annual memberships. Riders who purchase single ride or full day passes are classified as casual riders, while those with annual memberships are Cyclistic members. The company has identified that annual members are more profitable than casual riders. The key problem is: How can Cyclistic convert more casual riders into annual members? To address this, I need to analyze and compare usage patterns between casual riders and annual members to understand what behaviors, preferences, or circumstances distinguish these groups. 
+Business impact: The goal of this analysis is to generate actionable insights that will inform targeted marketing strategies aimed at encouraging casual riders to become annual members.The business task is to analyze historical trip data to identify key differences in behavior between casual riders and annual members and to develop data-driven strategies to convert more casual riders into annual members. 
+
+## Data Cleaning Summary (what was done to prep the data)
+The data is provided in a case study file and stored in a .csv format. It was uploaded to R and read as two separate data frames: div19_df (2019 data) and div20_df (2020 data). The files are comma-separated, with one row per trip and each column representing a variable (e.g., start time, end station).  The 2019 dataset has the following columns: trip identifiers and times: trip_id, start_time, end_time, tripduration; bike and station info: bikeid, from_station_id, from_station_name, to_station_id, to_station_name; and user data: usertype, gender, birth year. The 2020 dataset has the following columns: Trip info: ride_id, started_at, ended_at, tripduration (calculated); bike and station info: rideable_type, start_station_name, start_station_id, end_station_name, end_station_id; location data: start_lat, start_lng, end_lat, end_lng; and user data: member_casual (later standardized to usertype). Some user types may be underrepresented depending on location or operational changes in the system. Inconsistencies include that column names differ between years (e.g., member_casual vs usertype, started_at vs start_time). The 2019 dataset also lacks rideable type information, while the 2020 dataset includes it but only reports one type (“docked bike”), which may go to show that data collection had limitations or incomplete input. Some entries have missing station names or abnormal trip durations.  The datasets were anonymized; no personally identifiable information is present.
+Several packages were installed and loaded to read and manipulate the datasets. These packages include tidyverse, ggplot2 (creates visualizations like bar graphs and histograms), lubridate (parsing and manipulating date time data), and dplyr (filtering, grouping, summarizing, transforming data). I did several things to ensure the data was clean before analyzing it.
+I first verified the column types by using str(), head(), and colnames(). The datasets were checked for missing values in key columns like station names and usertypes. Ride durations were verified to remove outliers (negative times or trips over 24 hours). Column names were standardized, as well as values across both datasets, to enable consistent analysis. Verified data ranges and types after loading were computed. I ensured only complete and valid records were used in visualizations and summaries. All cleaning and transformation steps were performed in organized R script chunks. Comments (#) were added to explain why a cleaning step was taken. Code is reproducible and modular;each step can be reviewed and reused as needed. 
+
+## Analysis
+### Ride Duration Comparison 
+I first began by keeping the datasets separate; I had one dataframe for the 2019 dataset and another for 2020. I then grouped each dataset by its usertypes, and calculated average ride duration, median ride duration, and the distribution of ride durations. I found that in both years, customers had a higher average ride duration compared to subscribers. In both years, the average ride durations for customers stayed about the same: about 35 minutes. The average for a subscriber's average ride duration also stayed about the same: about 11 minutes. 
+```{r}
+print(SummaryStats)
+```
+I computed a histogram to see what ride durations were most popular. What is shown immediately is that subscribers have a lot of rides with durations that are about 500 seconds, or about an 8 minute ride duration. It looks like a bigger chunk of subscribers often take short rides. Their distribution was skewed more to the left, or shorter ride durations. Customers or casual riders had a lot more rides than subscribers that were longer
+```{r}
+print(G_RideDistr2019)
+print(G_RideDistr2020)
+```
+
+### Ride Patterns by Weekday 
+I also analyzed ride patterns. To do this, I extracted and graphed when a ride took place; I graphed on what day of the week a ride took place, and in a separate graph, plotted the time of day each ride took place at. I wanted to see if I could find a pattern for what days and what times rides often took place at. I found that the day with the most rides was Tuesday, followed by Thursday and third, Wednesday. The day with the least amount of rides was Sunday and Saturday. For customers specifically, the day with the most amount of rides occurred on Sunday, followed by Saturday. Customers' ride patterns during the week were low.  
+This bar chart displays the number of rides taken by each user type across different days of the week 
+```{r}
+print(G_RidesbyWeek)
+```
+### Ride Patterns by Hour of Day 
+There were several conclusions to be drawn for the Number of Rides by Hour of Day bar graph. For one, subscribers took rides mostly at 17:00, or 5:00 PM. A high number of rides also occurred at about 8 AM and 4:00 PM. Customers, on the other hand, had most rides occur in the late afternoon, from about 1PM to 5PM. All other times had low records of rides. 
+```{r}
+print(G_RidesbyHour)
+```
+### Popular Stations 
+I also wanted to see which stations, both start stations and end stations, were most popular among the two groups. 
+```{r}
+print(G_StartStations)
+```
+Subscribers’ most popular start station was Canal St. and Adams St station, as well as Clinton St & Washington Blvd station. Customers' most popular start station was HQ QR station. 
+
+```{r}
+print(G_EndStations)
+```
+Subscribers’ most popular end station was also Canal St & Adams St station, as well as Clinton St & Adams St station. Customer’s most popular end station was Streetar Dr. & Grand Ave station, as well as HQ QR station.  
+
+### Total Rides by Usertypes
+I wanted to analyze which group of people had the most amount of total rides. I created a barchart to do so, and it was very clear that subscribers have more total rides than customers do.
+```{r}
+print(G_TotalRides)
+```
+
+
+## Insights and Recommendations
+Deploy membership marketings such as signs, QR codes, or app notifications, at high traffic stations that are popular with casual riders. This will encourage them to upgrade by highlighting benefits (lower per-ride costs, unlimited rides, priority access). Customer’s high traffic stations are: HQ QR, Streeter Dr $ Grand Ave, and Lake Shore Dr & Monroe St.. 
+I found that customers tend to ride longer than subscribers, which likely indicated leisure use, while subscribers take shorter trips, possibly commuting. I recommend that customers are offered weekend passes with the option to convert to monthly memberships. For potential commuters, promote cost effectiveness and convenience of an annual membership, especially for people riding during weekday peak hours. 
+I found that customers tend to take more rides during the weekend. I recommend running weekend only membership discounters or limited time offers when casual riders are the most active. This increases the chance they'll convert when they are already using the service. 
+
+In the future, track usage of e-bikes or dockless bikes by usertype. You can offer exclusive access or discounts on e-bikes to members to make the membership more attractive, especially for those who want speed or convenience. 
+Overall, there should be a seamless conversion funnel. Any friction from the process of upgrading from a casual rider to a member should be removed. There should be in app upgrade options, or messages that highlight savings over time and send messages such as “You’ve taken x rides this month, you could have saved $x amount of money with a membership.” 
